@@ -3,10 +3,9 @@ import os
 import sys
 import time
 import shutil
-from watchdog.observers.polling import PollingObserverVFS
-from watchdog.events import PatternMatchingEventHandler
+from watchdog.observers.polling import PollingObserverVFS  
+from watchdog.events import PatternMatchingEventHandler 
 
-import module
 class MyHandler(PatternMatchingEventHandler):
     #patterns = ["*.*", ".*"]
 
@@ -16,35 +15,29 @@ class MyHandler(PatternMatchingEventHandler):
     def process(self, event):
         """
         event.event_type 
-            'modified'tr	 | 'created' | 'moved' | 'deleted'
+            'modified' | 'created' | 'moved' | 'deleted'
         event.is_directory
             True | False
         event.src_path
             path/to/observed/file
         """
-        '''if not event.is_directory:
-            # the file will be processed there
-            print('{} {} --> {}'.format(event.src_path,
-                                        event.event_type,
-                                        self._target_dir))
-            shutil.copy(event.src_path, self._target_dir)
-        '''
-        if event.event_type == 'modified':
-            print ('!!!!!')
-            print (event.src_path)
-            module.main_function(event.src_path)
+
+        print ('!!!!!!')
+        print (event.event_type)
 
     def on_modified(self, event):
         self.process(event)
 
-    #def on_created(self, event):
-        #self.process(event)
+    def on_created(self, event):
+        self.process(event)
+
 
 if __name__ == '__main__':
     args = sys.argv[1:]
     source_dir = args[0]
+    #target_dir = args[1]
 
-    observer = PollingObserverVFS(stat=os.stat, listdir=os.listdir, polling_interval=5)
+    observer = PollingObserverVFS(stat=os.stat, listdir=os.listdir, polling_interval=30)
     observer.schedule(MyHandler(patterns=['*.RESULT']),
                       path=source_dir)
     observer.start()

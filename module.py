@@ -15,6 +15,22 @@ class Transition:
         self.Q_Tr_f2 = []
         self.P_Tr_f2 = []
 ###########################################################
+def find_previous_energy (branch, file2):
+   if branch[0][2] == branch[0][3]:
+       return 0
+       #file2.write('%3d%3d%3d%12.5f %7.3f\n' % (branch[0][2],branch[0][3],branch[0][4],\
+       #                                                 branch[0][0], branch[0][1]))
+   elif len(branch)>=3:       
+       delta11 = branch[1][0]-branch[0][0]
+       delta12 = branch[2][0]-branch[1][0]
+
+       delta2 = delta12 - delta11
+       file2.write('%3d%3d%3d%12.5f\n' % (branch[0][2]-1,branch[0][3],branch[0][4]-1,\
+                                                              branch[0][0]-delta11+delta2))
+   return 0
+
+
+
 
 def main_function(src):
    file=open(src, 'r').readlines()
@@ -33,6 +49,8 @@ def main_function(src):
        file[i] = file[i].replace('_',' ')
        file[i] = file[i].replace('cd',' ')
        file[i] = file[i].replace('p',' ')
+       file[i] = file[i].replace('forbidden',' ')
+       file[i] = file[i].replace('sliplis',' ')
 
 
        '''with open('result','w') as F:
@@ -68,12 +86,12 @@ def main_function(src):
            Ka0=int(Ka0)
            Kc0=int(Kc0)
 
-           print (str1)
+           #print (str1)
            #print (abs(ref.J-J0),abs (ref.Kc-Kc0),ref.Ka,Ka0)
            if abs(ref.J-J0) == abs (ref.Kc-Kc0) and ref.Ka == Ka0:
                continue
            else:
-               print ('@')
+               #print ('@')
                if count == 1:
                    Up_State2 = Transition(J0, Ka0, Kc0)
                    count+=1
@@ -85,10 +103,9 @@ def main_function(src):
                    elif ref == Up_State2:
                        ref = Up_State1
        else:
-           print (str1)
            separate_transitions.Separate_transitions(J0,Ka0,Kc0,str1,ref)
 
-   file2 = open('RESULTS', 'w')
+   file2 = open('For_work/RESULTS', 'w')
 
    if count > 1:
        name_list = [Up_State1, Up_State2]
@@ -99,32 +116,54 @@ def main_function(src):
        file2.write('!!!--R Branch--!!!\n')
        for i in range(len(name.R_Tr)):
            if i == 0:
+               find_previous_energy (name.R_Tr, file2)
+
                file2.write('%3d%3d%3d%12.5f %7.3f\n' % (name.R_Tr[i][2],name.R_Tr[i][3],name.R_Tr[i][4],\
                                                         name.R_Tr[i][0], name.R_Tr[i][1]))
-           else:
-               file2.write('%3d%3d%3d%12.5f %7.3f %9.5f\n' % (name.R_Tr[i][2],name.R_Tr[i][3],name.R_Tr[i][4],\
+           elif i==1:
+               file2.write('%3d%3d%3d%12.5f %7.3f| %9.5f\n' % (name.R_Tr[i][2],name.R_Tr[i][3],name.R_Tr[i][4],\
                                                               name.R_Tr[i][0], name.R_Tr[i][1],\
-                                                              name.R_Tr[i][0]-name.R_Tr[i-1][0] ))
+                                                              name.R_Tr[i][0]-name.R_Tr[i-1][0]))
+           else:
+               file2.write('%3d%3d%3d%12.5f %7.3f| %9.5f %9.5f\n' % (name.R_Tr[i][2],name.R_Tr[i][3],name.R_Tr[i][4],\
+                                                              name.R_Tr[i][0], name.R_Tr[i][1],\
+                                                              name.R_Tr[i][0]-name.R_Tr[i-1][0],\
+                                                              name.R_Tr[i][0]-name.R_Tr[i-1][0]-\
+                                                              name.R_Tr[i-1][0]+name.R_Tr[i-2][0] ))
 
        file2.write('\n!!!--Q Branch--!!!\n')
        for i in range(len(name.Q_Tr)):
            if i == 0:
+               find_previous_energy (name.Q_Tr, file2)             
                file2.write('%3d%3d%3d%12.5f %7.3f\n' % (name.Q_Tr[i][2],name.Q_Tr[i][3],name.Q_Tr[i][4],\
                                                         name.Q_Tr[i][0],name.Q_Tr[i][1]))
-           else:
-               file2.write('%3d%3d%3d%12.5f %7.3f %9.5f\n' % (name.Q_Tr[i][2],name.Q_Tr[i][3],name.Q_Tr[i][4],\
+           elif i==1:
+               file2.write('%3d%3d%3d%12.5f %7.3f| %9.5f\n' % (name.Q_Tr[i][2],name.Q_Tr[i][3],name.Q_Tr[i][4],\
                                                               name.Q_Tr[i][0], name.Q_Tr[i][1],\
                                                      name.Q_Tr[i][0]-name.Q_Tr[i-1][0] ))
+           else:
+               file2.write('%3d%3d%3d%12.5f %7.3f| %9.5f %9.5f\n' % (name.Q_Tr[i][2],name.Q_Tr[i][3],name.Q_Tr[i][4],\
+                                                              name.Q_Tr[i][0], name.Q_Tr[i][1],\
+                                                              name.Q_Tr[i][0]-name.Q_Tr[i-1][0],\
+                                                              name.Q_Tr[i][0]-name.Q_Tr[i-1][0]-\
+                                                              name.Q_Tr[i-1][0]+name.Q_Tr[i-2][0] ))
 
-   file2.write('\n!!!--P Branch--!!!\n')
-   for i in range(len(name.P_Tr)):
-       if i == 0:
-           file2.write('%3d%3d%3d%12.5f %7.3f\n' % (name.P_Tr[i][2],name.P_Tr[i][3],name.P_Tr[i][4],\
+       file2.write('\n!!!--P Branch--!!!\n')
+       for i in range(len(name.P_Tr)):
+           if i == 0:
+               find_previous_energy (name.P_Tr, file2)
+               file2.write('%3d%3d%3d%12.5f %7.3f\n' % (name.P_Tr[i][2],name.P_Tr[i][3],name.P_Tr[i][4],\
                                                     name.P_Tr[i][0], name.P_Tr[i][1]))
-       else:
-           file2.write('%3d%3d%3d%12.5f %7.3f %9.5f\n' % (name.P_Tr[i][2],name.P_Tr[i][3],name.P_Tr[i][4],\
-                                                          name.P_Tr[i][0], name.P_Tr[i][1],\
-                                     name.P_Tr[i][0]-name.P_Tr[i-1][0] ))
+           elif i==1:
+               file2.write('%3d%3d%3d%12.5f %7.3f| %9.5f\n' % (name.P_Tr[i][2],name.P_Tr[i][3],name.P_Tr[i][4],\
+                                                              name.P_Tr[i][0], name.P_Tr[i][1],\
+                                                              name.P_Tr[i][0]-name.P_Tr[i-1][0] ))
+           else:
+               file2.write('%3d%3d%3d%12.5f %7.3f| %9.5f %9.5f\n' % (name.P_Tr[i][2],name.P_Tr[i][3],name.P_Tr[i][4],\
+                                                              name.P_Tr[i][0], name.P_Tr[i][1],\
+                                                              name.P_Tr[i][0]-name.P_Tr[i-1][0],\
+                                                              name.P_Tr[i][0]-name.P_Tr[i-1][0]-\
+                                                              name.P_Tr[i-1][0]+name.P_Tr[i-2][0] ))
 
    for attribute in [name.P_Tr_f1,name.P_Tr_f2,name.R_Tr_f1,name.R_Tr_f2,\
                       name.Q_Tr_f1,name.Q_Tr_f2]:
@@ -134,10 +173,17 @@ def main_function(src):
                if i == 0:
                    file2.write('%3d%3d%3d%12.5f %7.3f\n' % (attribute[i][2],attribute[i][3],attribute[i][4],\
                                                             attribute[i][0], attribute[i][1]))
-               else:
-                   file2.write('%3d%3d%3d%12.5f %7.3f %9.5f\n' % (attribute[i][2],attribute[i][3],attribute[i][4],\
+               elif i==1:
+                   file2.write('%3d%3d%3d%12.5f %7.3f| %9.5f\n' % (attribute[i][2],attribute[i][3],attribute[i][4],\
                                                                   attribute[i][0], attribute[i][1],\
-                                               attribute[i][0]-attribute[i-1][0]))
+                                                                  attribute[i][0]-attribute[i-1][0]))
+               else:
+                   file2.write('%3d%3d%3d%12.5f %7.3f| %9.5f %9.5f\n' % (attribute[i][2],attribute[i][3],attribute[i][4],\
+                                                                         attribute[i][0], attribute[i][1],\
+                                                                         attribute[i][0]-attribute[i-1][0],\
+                                                                         attribute[i][0]-attribute[i-1][0]\
+                                                                         -attribute[i-1][0]+attribute[i-2][0] ))
+
 
    file2.close()
 
