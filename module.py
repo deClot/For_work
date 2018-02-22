@@ -29,7 +29,15 @@ def find_previous_energy (branch, file2):
                                                               branch[0][0]-delta11+delta2))
    return 0
 
+def find_continiuos_energy (branch,i,file2):
+    if i == len(branch)-1:
+        file2.write('%3d%3d%3d%12.5f\n' % (branch[i][2]+1,branch[i][3],branch[i][4]+1,\
+                                                              branch[i][0]+branch[i][0]-branch[i-1][0]+\
+                                                              branch[i][0]-branch[i-1][0]-\
+                                                              branch[i-1][0]+branch[i-2][0]))
 
+
+    return 0
 
 
 def main_function(src):
@@ -130,6 +138,7 @@ def main_function(src):
                                                               name.R_Tr[i][0]-name.R_Tr[i-1][0],\
                                                               name.R_Tr[i][0]-name.R_Tr[i-1][0]-\
                                                               name.R_Tr[i-1][0]+name.R_Tr[i-2][0] ))
+           find_continiuos_energy (name.R_Tr,i,file2)
 
        file2.write('\n!!!--Q Branch--!!!\n')
        for i in range(len(name.Q_Tr)):
@@ -147,6 +156,7 @@ def main_function(src):
                                                               name.Q_Tr[i][0]-name.Q_Tr[i-1][0],\
                                                               name.Q_Tr[i][0]-name.Q_Tr[i-1][0]-\
                                                               name.Q_Tr[i-1][0]+name.Q_Tr[i-2][0] ))
+           find_continiuos_energy (name.Q_Tr,i,file2) 
 
        file2.write('\n!!!--P Branch--!!!\n')
        for i in range(len(name.P_Tr)):
@@ -164,6 +174,7 @@ def main_function(src):
                                                               name.P_Tr[i][0]-name.P_Tr[i-1][0],\
                                                               name.P_Tr[i][0]-name.P_Tr[i-1][0]-\
                                                               name.P_Tr[i-1][0]+name.P_Tr[i-2][0] ))
+           find_continiuos_energy (name.P_Tr,i,file2)
 
    for attribute in [name.P_Tr_f1,name.P_Tr_f2,name.R_Tr_f1,name.R_Tr_f2,\
                       name.Q_Tr_f1,name.Q_Tr_f2]:
